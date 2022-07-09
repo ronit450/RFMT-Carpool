@@ -259,24 +259,31 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         switch (error.code) {
           case "invalid-email":
             errorMessage = "Your email address appears to be malformed.";
+            Navigator.pop(context);
             break;
           case "wrong-password":
             errorMessage = "Your password is wrong.";
+            Navigator.pop(context);
             break;
           case "user-not-found":
             errorMessage = "User with this email doesn't exist.";
+            Navigator.pop(context);
             break;
           case "user-disabled":
             errorMessage = "User with this email has been disabled.";
+            Navigator.pop(context);
             break;
           case "too-many-requests":
             errorMessage = "Too many requests";
+            Navigator.pop(context);
             break;
           case "operation-not-allowed":
             errorMessage = "Signing in with Email and Password is not enabled.";
+            Navigator.pop(context);
             break;
           default:
             errorMessage = "An undefined Error happened.";
+            Navigator.pop(context);
         }
         Fluttertoast.showToast(msg: errorMessage!);
         print(error.code);
