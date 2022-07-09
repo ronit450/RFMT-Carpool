@@ -1,4 +1,5 @@
 // import 'package:email_password_login/screens/home_screen.dart';
+import 'package:flutter_application_1/progress_bar.dart';
 import 'package:flutter_application_1/registration_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -166,6 +167,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // login function
   void signIn(String email, String password) async {
+    showDialog(context: context , 
+    barrierDismissible: false,
+    builder: (BuildContext context)
+    {
+      return ProgressDialogue(message: "Authenticating.....Please Wait!");
+
+    }
+    );
     if (_formKey.currentState!.validate()) {
       try {
         await _auth
@@ -176,27 +185,38 @@ class _LoginScreenState extends State<LoginScreen> {
                       MaterialPageRoute(builder: (context) => Homepage())),
                 });
       } on FirebaseAuthException catch (error) {
+        Navigator.pop(context);
         switch (error.code) {
+          
           case "invalid-email":
+           
             errorMessage = "Your email address appears to be malformed.";
+            Navigator.pop(context);
 
             break;
           case "wrong-password":
+
             errorMessage = "Your password is wrong.";
+            Navigator.pop(context);
             break;
           case "user-not-found":
+            
             errorMessage = "User with this email doesn't exist.";
             break;
           case "user-disabled":
+          
             errorMessage = "User with this email has been disabled.";
             break;
           case "too-many-requests":
+            Navigator.pop(context);
             errorMessage = "Too many requests";
             break;
           case "operation-not-allowed":
+    
             errorMessage = "Signing in with Email and Password is not enabled.";
             break;
           default:
+        
             errorMessage = "An undefined Error happened.";
         }
         Fluttertoast.showToast(msg: errorMessage!);
