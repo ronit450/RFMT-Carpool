@@ -1,0 +1,45 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "RFM_Carpool",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "RFM_Carpool (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "RFM_Carpool (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "carpool_code",
+            "cwd": "carpool_code",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "carpool_code (profile mode)",
+            "cwd": "carpool_code",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "carpool_code (release mode)",
+            "cwd": "carpool_code",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
