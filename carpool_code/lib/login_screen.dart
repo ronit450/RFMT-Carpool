@@ -165,39 +165,46 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  dynamic  Progress_bar(){
+      showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return ProgressDialogue(message: "Authenticating.....Please Wait!");
+        });
+
+  }
+
   // login function
   void signIn(String email, String password) async {
-    showDialog(context: context , 
-    barrierDismissible: false,
-    builder: (BuildContext context)
-    {
-      return ProgressDialogue(message: "Authenticating.....Please Wait!");
-
-    }
-    );
+    
+    
     if (_formKey.currentState!.validate()) {
       try {
+        Progress_bar();
         await _auth
             .signInWithEmailAndPassword(email: email, password: password)
             .then((uid) => {
+              
                   Fluttertoast.showToast(msg: "Login Successful"),
                   Navigator.of(context).pushReplacement(
                       MaterialPageRoute(builder: (context) => Homepage())),
                 });
       } on FirebaseAuthException catch (error) {
-        Navigator.pop(context);
+      Navigator.pop(context);
+        
         switch (error.code) {
           
           case "invalid-email":
-           
-            errorMessage = "Your email address appears to be malformed.";
-            Navigator.pop(context);
+         
+          errorMessage = "Your email address appears to be malformed.";
+      
 
-            break;
+          break;
           case "wrong-password":
-
+     
             errorMessage = "Your password is wrong.";
-            Navigator.pop(context);
+        
             break;
           case "user-not-found":
             
@@ -208,7 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
             errorMessage = "User with this email has been disabled.";
             break;
           case "too-many-requests":
-            Navigator.pop(context);
+      
             errorMessage = "Too many requests";
             break;
           case "operation-not-allowed":

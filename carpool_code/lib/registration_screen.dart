@@ -238,14 +238,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  void signUp(String email, String password) async {
+
+  dynamic Progress_bar() {
     showDialog(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return ProgressDialogue(message: "Registering.....Please Wait!");
+          return ProgressDialogue(message: "Authenticating.....Please Wait!");
         });
+  }
+
+  void signUp(String email, String password) async {
+
     if (_formKey.currentState!.validate()) {
+      Progress_bar();
       try {
         await _auth
             .createUserWithEmailAndPassword(email: email, password: password)
@@ -256,6 +262,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       MaterialPageRoute(builder: (context) => Homepage()));
         });
       } on FirebaseAuthException catch (error) {
+        Navigator.pop(context);
         switch (error.code) {
           case "invalid-email":
             errorMessage = "Your email address appears to be malformed.";

@@ -19,7 +19,7 @@ class Welcome extends StatelessWidget {
 
           Image.asset("assets/images/welcome.png",
           fit: BoxFit.cover,
-          height: size.height * 0.6,
+          height: size.height * 0.5,
           width: size.width* 0.8,),
           SizedBox(height: size.height * 0.05,
           ),
@@ -30,7 +30,7 @@ class Welcome extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26, color: Colors.purple.shade300),
                 ),
           SizedBox(
-            height: size.height * 0.05,
+            height: size.height * 0.02,
           ),
            SizedBox(
              height: size.height * 0.07,
@@ -40,7 +40,7 @@ class Welcome extends StatelessWidget {
                style: TextButton.styleFrom(
                  backgroundColor: Colors.purple,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 50, vertical: 10),
+                            horizontal: 20, vertical: 5),
                             shadowColor: Colors.purple,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20))),
@@ -62,7 +62,7 @@ class Welcome extends StatelessWidget {
                     style: TextButton.styleFrom(
                        backgroundColor: Colors.purple,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 50, vertical: 10),
+                            horizontal: 20, vertical: 5),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20))),
                     child: Text("Signup"),
