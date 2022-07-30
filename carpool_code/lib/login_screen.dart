@@ -1,4 +1,5 @@
 // import 'package:email_password_login/screens/home_screen.dart';
+import 'package:flutter_application_1/main_screen.dart';
 import 'package:flutter_application_1/progress_bar.dart';
 import 'package:flutter_application_1/registration_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -188,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
               
                   Fluttertoast.showToast(msg: "Login Successful"),
                   Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => Homepage())),
+                      MaterialPageRoute(builder: (context) => Main_Screen())),
                 });
       } on FirebaseAuthException catch (error) {
       Navigator.pop(context);

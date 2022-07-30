@@ -42,10 +42,13 @@ dependencies:
   fluttertoast: ^8.0.9
   firebase_database: ^9.0.12
   loading_animation_widget: ^1.2.0+2
+  google_maps_flutter: ^2.1.10
+  geolocator: ^9.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

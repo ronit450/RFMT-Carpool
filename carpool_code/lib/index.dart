@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/homepage.dart';
 
 import 'package:flutter_application_1/login_screen.dart';
+import 'package:flutter_application_1/main_screen.dart';
 import 'package:flutter_application_1/model/carpool_Request.dart';
 import 'package:flutter_application_1/registration_screen.dart';
 import 'package:flutter_application_1/request_page.dart';
@@ -58,6 +59,7 @@ class Carpool extends StatelessWidget {
         '/signup': (context) => RegistrationScreen(),
         '/ride_request': (context) => Ride_Request(),
         '/request_page' :(context) => RideRequest(),
+        '/main_screen':(context) => Main_Screen(),
       },
     );
   }

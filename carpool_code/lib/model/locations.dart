@@ -1,4 +1,4 @@
-import 'dart:ffi';
+
 
 class Data{
   String areas , latitude , longitude ;
