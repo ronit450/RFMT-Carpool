@@ -5,6 +5,10 @@ import 'package:flutter_application_1/registration_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/homepage.dart';
+import 'package:flutter_application_1/request_page.dart';
+import 'package:flutter_application_1/ride_request.dart';
+import 'package:flutter_application_1/utils/routes.dart';
+import 'package:flutter_application_1/welcome.dart';
 // import 'package:flutter_application_1/registration_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
