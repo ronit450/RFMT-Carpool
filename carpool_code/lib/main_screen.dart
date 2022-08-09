@@ -1,12 +1,16 @@
 // ignore_for_file: prefer_final_fields, non_constant_identifier_names, unused_element, prefer_const_literals_to_create_immutables
 
 import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/divider.dart';
 import 'package:flutter_application_1/drawer.dart';
 import 'package:flutter_application_1/model/user_model.dart';
-
+import 'package:flutter_application_1/model/Request_Model.dart';
+import 'package:flutter_application_1/request_page.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +28,7 @@ class Main_Screen extends StatefulWidget {
 
 class _Main_ScreenState extends State<Main_Screen> {
   User? user = FirebaseAuth.instance.currentUser;
+  final _auth = FirebaseAuth.instance;
   UserModel loggedInUser = UserModel();
     void initState() {
     super.initState();
@@ -38,6 +43,7 @@ class _Main_ScreenState extends State<Main_Screen> {
   }
 
   // Declaration of variables.
+  double bottom_padding_of_map = 0.0 ;
   String string_selected_date = "";
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
@@ -45,6 +51,24 @@ class _Main_ScreenState extends State<Main_Screen> {
   TextEditingController _timeController = TextEditingController();
   Completer<GoogleMapController> _google_map_controller = Completer();
   late GoogleMapController new_google_map_controller_for_saving;
+
+  late Position current_position;
+  var geoLocater = Geolocator();
+
+  void locateCurrentpos() async {
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    current_position = position;
+
+    // As the location comes with Geopoint with lattitude and longitude
+    LatLng lat_position = LatLng(position.latitude, position.longitude); 
+
+
+    CameraPosition cameraPosition = new CameraPosition(target: lat_position, zoom:14);
+    new_google_map_controller_for_saving.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+
+  }
+
+
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
     zoom: 14.4746,
@@ -78,7 +102,9 @@ class _Main_ScreenState extends State<Main_Screen> {
           padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: MediaQuery.of(context).size.width,
           onPressed: () {
+          
             // FirebaseFirestore.instance.collection("RideRequest").add(request_map);
+            postDetailsToFirestore();
             Navigator.pushNamed(context, Myroutes.Carpool_Request_page);
           },
           child: Text(
@@ -147,9 +173,10 @@ class _Main_ScreenState extends State<Main_Screen> {
 
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-          backgroundColor: Colors.white,
-          // elevation: 0,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.red),
             onPressed: () {
@@ -163,12 +190,24 @@ class _Main_ScreenState extends State<Main_Screen> {
       body: Stack(
         children: [
           GoogleMap(
+            padding: EdgeInsets.only(bottom: bottom_padding_of_map),
+            compassEnabled: true,
             mapType: MapType.normal,
+            myLocationEnabled: true,
+            zoomGesturesEnabled: true,
+            zoomControlsEnabled: true,
             myLocationButtonEnabled: true,
             initialCameraPosition: _kGooglePlex,
+
+            // Map being created
             onMapCreated: (GoogleMapController controller) {
               _google_map_controller.complete(controller);
               new_google_map_controller_for_saving = controller;
+              setState(() {
+                bottom_padding_of_map = 300.0;
+              });
+
+              locateCurrentpos();
             },
           ),
           Positioned(
@@ -296,8 +335,55 @@ class _Main_ScreenState extends State<Main_Screen> {
       ),
     );
   }
+  postDetailsToFirestore() async {
+
+    // calling our firestore
+    // calling our user model
+    // sedning these values
+
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+
+      Map<String, dynamic> data = {
+      "pickup": GeoPoint(50,90),
+      "dropoff": GeoPoint(14,60),
+      "time": _timeController.text,
+      "date": _dateController.text,
+      "uid" : user!.uid
+    };
+
+    Carpool_req reqModel = Carpool_req();
+
+    // writing all the values
+    reqModel.pickup = GeoPoint(40, 90);
+    reqModel.dropoff = GeoPoint(40, 60);
+    reqModel.date = "90";
+    reqModel.time = "52";
+
+
+    await firebaseFirestore
+        .collection("carpool_req")
+        .doc(user!.uid)
+        .set(data);
+    Fluttertoast.showToast(msg: "Account created successfully :) ");
+  }
 }
 class AlwaysDisabledFocusNode extends FocusNode {
   @override
   bool get hasFocus => false;
 }
+
+
+
+void sending_request_to_firestore(String pickup, String dropoff, String Date, String time){
+  Map<String, dynamic> data = {
+    "pickup": {"lat": 50, 'long': 20},
+    "dropoff": {"lat": 40, 'long': 20},
+    "time": "5:00",
+    "date": "25",
+  };
+
+  
+}
+
+
+

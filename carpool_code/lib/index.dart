@@ -10,7 +10,8 @@ import 'package:flutter_application_1/model/carpool_Request.dart';
 import 'package:flutter_application_1/registration_screen.dart';
 import 'package:flutter_application_1/request_page.dart';
 import 'package:flutter_application_1/ride_request.dart';
-
+import 'package:geolocator/geolocator.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:flutter_application_1/welcome.dart';
 
 
