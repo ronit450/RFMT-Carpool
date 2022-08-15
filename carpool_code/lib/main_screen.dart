@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_application_1/Reverse_Geocoding/place_searcher_methods.dart';
 import 'package:flutter_application_1/divider.dart';
 import 'package:flutter_application_1/drawer.dart';
 import 'package:flutter_application_1/model/user_model.dart';
@@ -55,16 +56,25 @@ class _Main_ScreenState extends State<Main_Screen> {
   late Position current_position;
   var geoLocater = Geolocator();
 
+
+
+
   void locateCurrentpos() async {
+    
+    LocationPermission permission;
+    permission = await Geolocator.requestPermission();
+
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     current_position = position;
-
     // As the location comes with Geopoint with lattitude and longitude
     LatLng lat_position = LatLng(position.latitude, position.longitude); 
 
-
     CameraPosition cameraPosition = new CameraPosition(target: lat_position, zoom:14);
     new_google_map_controller_for_saving.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+
+    String address = await placeSearcherMethods.searchCoodinateAddress(position);
+    print("ap yhan rehte hen?" + address);
+    
 
   }
 
@@ -364,7 +374,7 @@ class _Main_ScreenState extends State<Main_Screen> {
         .collection("carpool_req")
         .doc(user!.uid)
         .set(data);
-    Fluttertoast.showToast(msg: "Account created successfully :) ");
+    Fluttertoast.showToast(msg: "Request Added Sucessfully");
   }
 }
 class AlwaysDisabledFocusNode extends FocusNode {
@@ -386,4 +396,18 @@ void sending_request_to_firestore(String pickup, String dropoff, String Date, St
 }
 
 
-
+class GeolocatorService {
+  Future<Position?> determinePosition() async {
+    LocationPermission permission;
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error('Location Not Available');
+      }
+    } else {
+      throw Exception('Error');
+    }
+    return await Geolocator.getCurrentPosition();
+  }
+}
