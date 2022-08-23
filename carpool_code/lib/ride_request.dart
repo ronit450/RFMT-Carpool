@@ -1,58 +1,31 @@
-// ignore_for_file: camel_case_types, unnecessary_import, unused_local_variable, unnecessary_null_comparison, curly_braces_in_flow_control_structures, unused_element, non_constant_identifier_names, await_only_futures, deprecated_member_use
-// import 'dart:html';
-import 'package:flutter_application_1/model/user_model.dart';
+// ignore_for_file: prefer_final_fields, non_constant_identifier_names, unused_element, prefer_const_literals_to_create_immutables
+
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_application_1/model/carpool_Request.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'package:flutter_application_1/drawer.dart';
-import 'package:flutter_application_1/login_screen.dart';
-import 'package:flutter_application_1/utils/routes.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_application_1/dataHandler/dataHandler.dart';
 import 'package:flutter_application_1/model/Request_Model.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_application_1/model/user_model.dart';
+import 'package:flutter_application_1/utils/routes.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
-class Ride_Request extends StatefulWidget {
-  const Ride_Request({Key? key}) : super(key: key);
-
+class ride_request extends StatefulWidget {
+  const ride_request({ Key? key }) : super(key: key);
+  
   @override
-  State<Ride_Request> createState() => _Ride_RequestState();
+  State<ride_request> createState() => _ride_requestState();
 }
 
-class _Ride_RequestState extends State<Ride_Request> {
+class _ride_requestState extends State<ride_request> {
   User? user = FirebaseAuth.instance.currentUser;
-  UserModel loggedInUser = UserModel();
-
   final _auth = FirebaseAuth.instance;
-  DateTime selectedDate = DateTime.now();
-  TimeOfDay selectedTime = TimeOfDay.now();
-  String string_selected_date = "";
-  // List <String> items = [] ;
-  var items = <String>[];
-  var retrievedData;
-  var map = new Map();
-
- 
-  @override
+  UserModel loggedInUser = UserModel();
   void initState() {
     super.initState();
-    var collectionReferece = FirebaseFirestore.instance.collection('areas');
-    collectionReferece.get().then((collectionSnapshot) {
-      retrievedData = collectionSnapshot.docs.toList();
-      items.clear();
-      for (var i = 0; i < retrievedData.length - 1; i++) {
-        items.add(retrievedData[i]['areaName']);
-        map[retrievedData[i]['areaName']] = [
-          retrievedData[i]['lat'],
-          retrievedData[i]['long']
-        ];
-      }
-      print(items);
-    });
     FirebaseFirestore.instance
         .collection("users")
         .doc(user!.uid)
@@ -63,78 +36,36 @@ class _Ride_RequestState extends State<Ride_Request> {
     });
   }
 
-  String dropdownvalue = 'Bahadurabad';
-
-  // Defining the Text Controller for all the fields on page
+  String string_selected_date = "";
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.now();
   TextEditingController _dateController = TextEditingController();
   TextEditingController _timeController = TextEditingController();
-  TextEditingController _areaController = TextEditingController();
-
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked_s = await showTimePicker(
-      context: context,
-      initialTime: selectedTime,
-    );
-    if (picked_s != null)
-      setState(() {
-        selectedTime = picked_s;
-        DateTime parsedTime =
-            DateFormat.jm().parse(picked_s.format(context).toString());
-        String formattedTime = DateFormat('HH:mm:ss').format(parsedTime);
-        _timeController.text = formattedTime;
-      });
-  }
-
-  Future<void> _selectarea(BuildContext context) async {
-    final picked_area = await DropdownButtonHideUnderline(
-      child: DropdownButton(
-        iconEnabledColor: Colors.white,
-        value: dropdownvalue,
-        style: TextStyle(color: Colors.white),
-        icon: Icon(Icons.keyboard_arrow_down),
-        items: items.map((String items) {
-          return DropdownMenuItem(
-              value: items,
-              child: Text(
-                items,
-                style: TextStyle(color: Colors.black),
-              ));
-        }).toList(),
-        onChanged: (newValue) {
-          setState(() {
-            dropdownvalue = newValue as String;
-            _areaController.text = dropdownvalue;
-          });
-        },
-      ),
-    );
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-      DateFormat dateFormat = DateFormat("yyyy-MM-dd");
-      string_selected_date = dateFormat.format(selectedDate);        
-        var date =
-            "${picked.toLocal().day}/${picked.toLocal().month}/${picked.toLocal().year}";
-        selectedDate = picked;
-        _dateController.text = date;
-      });
-    }
-  }
+  TextEditingController _pickup = TextEditingController();
+  TextEditingController _dropoff = TextEditingController();
 
   @override
+
+
   Widget build(BuildContext context) {
-    DateTime selectedDate = DateTime.now();
-    Size size = MediaQuery.of(context).size;
-    TimeOfDay selectedTime = TimeOfDay.now();
-     var request_map = {loggedInUser.uid.toString(): [dropdownvalue, string_selected_date, selectedTime]};
-    // Request
+    // Select time field
+    Future<void> _selectTime(BuildContext context) async {
+      final TimeOfDay? picked_s = await showTimePicker(
+        context: context,
+        initialTime: selectedTime,
+      );
+      if (picked_s != null)
+        // ignore: curly_braces_in_flow_control_structures
+        setState(() {
+          selectedTime = picked_s;
+          DateTime parsedTime =
+              DateFormat.jm().parse(picked_s.format(context).toString());
+          String formattedTime = DateFormat('HH:mm:ss').format(parsedTime);
+          _timeController.text = formattedTime;
+        });
+    }
+
+// Carpool Request Button
     final makeRequest = Material(
       elevation: 5,
       borderRadius: BorderRadius.circular(30),
@@ -142,9 +73,9 @@ class _Ride_RequestState extends State<Ride_Request> {
       child: MaterialButton(
           padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: MediaQuery.of(context).size.width,
-          
           onPressed: () {
             // FirebaseFirestore.instance.collection("RideRequest").add(request_map);
+            postDetailsToFirestore();
             Navigator.pushNamed(context, Myroutes.Carpool_Request_page);
           },
           child: Text(
@@ -155,151 +86,262 @@ class _Ride_RequestState extends State<Ride_Request> {
           )),
     );
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-          backgroundColor: Colors.white,
-          // elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.red),
-            onPressed: () {
-              // passing this to our root
-              Navigator.of(context).pop();
-            },
-          )),
-      // drawer: MyDrawer(),
-      body: SingleChildScrollView(
-          child: Container(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(36.0),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Image.asset(
-                  "assets/images/hu_logo.png",
-                  fit: BoxFit.contain,
-                  height: 150,
-                  
-                ),
+    Widget pickup_dropoff(String text, Icon icon_to_put, TextEditingController controller_for_field){
+      return Row(
+        children: [
+          Icon(icon_to_put.icon),
+          SizedBox(width: 18,),
+          Expanded(child: 
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.grey,
+              borderRadius: BorderRadius.circular(6),
+             ),
+             child: Padding(padding: EdgeInsets.all(3.0),
+             child: TextField(
+              controller: controller_for_field,
+              decoration: InputDecoration(
+              hintText: "Pickup Location", 
+              fillColor: Colors.grey,
+              filled: true,
+              border: InputBorder.none,
+              isDense: true, 
+              contentPadding: EdgeInsets.only(left: 11, top: 8, bottom: 8)
+             ),),
+              ),
+             ))
+        ],
 
-                SizedBox(
-                  height: size.height * 0.04,
-                ),
+      );
+    }
 
-                SizedBox(
-                  height: size.height * 0.06,
-                  width: size.width * 0.7,
-                  child: InkWell(
-                    child: TextFormField(
-                      onSaved: (newValue) => selectedDate,
-                      readOnly: true,
-                      onTap: () {
-                        _selectDate(context);
-                        _dateController.clear();
-                      },
-                      textInputAction: TextInputAction.next,
-                      focusNode: AlwaysDisabledFocusNode(),
-                      controller: _dateController,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.calendar_month),
-                        filled: true,
-                        hintText: "Select Date",
-                        contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-                        labelText: "Select Date",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: size.height * 0.04,
-                ),
-
-                SizedBox(
-                  height: size.height * 0.06,
-                  width: size.width * 0.7,
-                  child: InkWell(
-                    child: TextFormField(
-                      focusNode: AlwaysDisabledFocusNode(),
-                      controller: _timeController,
-                      readOnly: true,
-                      onTap: () {
-                        // FocusScope.of(context).requestFocus(FocusNode());
-                        _selectTime(context);
-                      },
-                      autofocus: false,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.timer),
-                        filled: true,
-                        contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-                        labelText: "Select Time",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                SizedBox(
-                  height: size.height * 0.04,
-                ),
-
-               
-                SizedBox(
-                  height: size.height * 0.06,
-                  width: size.width * 0.7,
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      filled: true,
-                      prefixIcon: Icon(Icons.home_filled),
-                      suffixIcon: Icon(Icons.arrow_downward),
-                      contentPadding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-                      hintText: "Select Area",
-                      labelText: "Select Area",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Center(
-                      child: (DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                          isExpanded: true,
-                          iconEnabledColor: Colors.white,
-                          value: dropdownvalue,
-                          icon: Icon(Icons.keyboard_arrow_down),
-                          items: items.map((String items) {
-                            return DropdownMenuItem(
-                                value: items,
-                                child: Text(
-                                  items,
-                                  style: TextStyle(color: Colors.black),
-                                ));
-                          }).toList(),
-                          onChanged: (newValue) {
-                            setState(() {
-                              dropdownvalue = newValue as String;
-                            });
-                          },
-                        ),
-                      )),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 35),
-                makeRequest,
-              ]),
+    Future<void> _selectDate(BuildContext context) async {
+      final DateTime? picked = await showDatePicker(
+          context: context,
+          initialDate: selectedDate,
+          firstDate: DateTime.now(),
+          lastDate: DateTime(2101));
+      if (picked != null && picked != selectedDate) {
+        setState(() {
+          DateFormat dateFormat = DateFormat("yyyy-MM-dd");
+          string_selected_date = dateFormat.format(selectedDate);
+          var date =
+              "${picked.toLocal().day}/${picked.toLocal().month}/${picked.toLocal().year}";
+          selectedDate = picked;
+          _dateController.text = date;
+        });
+      }
+    }
+  Widget select_time() {
+      return InkWell(
+        child: TextFormField(
+          onSaved: (newValue) => selectedDate,
+          readOnly: true,
+          onTap: () {
+            _selectDate(context);
+            _dateController.clear();
+          },
+          textInputAction: TextInputAction.next,
+          focusNode: AlwaysDisabledFocusNode(),
+          controller: _dateController,
+          decoration: InputDecoration(
+            prefixIcon: Icon(Icons.calendar_month),
+            filled: true,
+            hintText: "Date",
+            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+            labelText: "Date",
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
         ),
-      )),
+      );
+    }
+
+
+
+    Widget pickup_and_dropoff(String text) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black54,
+              blurRadius: 6.0,
+              offset: Offset(0.7, 0.7),
+              spreadRadius: 0.5,
+            )
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Row(
+            children: [
+              Icon(
+                CupertinoIcons.search,
+                color: Colors.purple,
+              ),
+              Text(text),
+              SizedBox(
+                height: 26.0,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Select Date field for carpool request
+
+
+
+    Size size = MediaQuery.of(context).size;
+    String placeAddress = Provider.of<carpool_data>(context).pickupLocation!.placeName?? "";
+    _pickup.text = placeAddress;
+    return Scaffold(
+      body: Column(children: [
+        Container(
+          height: 340,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black,
+                blurRadius: 6.0,
+                offset: Offset(0.7, 0.7),
+                spreadRadius: 0.5,
+              )
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.only(left: 25, right: 25, top: 25, bottom: 20),
+            child:Column(children: [
+              SizedBox(height: 5),
+              Stack(
+                children: [
+                  GestureDetector(
+                    onTap:(){
+                      Navigator.pop(context);
+                    },
+                    child: Icon(Icons.arrow_back)),
+                  Center(
+                    child: Text(
+                      "Make a Request", 
+                      style: TextStyle(fontSize: 25, fontFamily: "Brand-Bold"),
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(height: 24,),
+              pickup_dropoff("Search Pickup Location", Icon(CupertinoIcons.location), _pickup),
+              SizedBox(height: 18,),
+              pickup_dropoff("Search Dropoff Location", Icon(Icons.pin_drop_outlined), _dropoff ), 
+              SizedBox(height: 18,),
+              Column(
+                    children: [
+                      SizedBox(
+                        height: size.height * 0.06,
+                        width: size.width * 0.42,
+                        child: InkWell(
+                          child: TextFormField(
+                            onSaved: (newValue) => selectedDate,
+                            readOnly: true,
+                            onTap: () {
+                              _selectDate(context);
+                              _dateController.clear();
+                            },
+                            textInputAction: TextInputAction.next,
+                            focusNode: AlwaysDisabledFocusNode(),
+                            controller: _dateController,
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(Icons.calendar_month),
+                              filled: true,
+                              hintText: "Date",
+                              contentPadding:
+                                  EdgeInsets.fromLTRB(20, 15, 20, 15),
+                              labelText: "Date",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      SizedBox(
+                        height: size.height * 0.06,
+                        width: size.width * 0.42,
+                        child: InkWell(
+                          child: TextFormField(
+                            focusNode: AlwaysDisabledFocusNode(),
+                            controller: _timeController,
+                            readOnly: true,
+                            onTap: () {
+                              // FocusScope.of(context).requestFocus(FocusNode());
+                              _selectTime(context);
+                            },
+                            autofocus: false,
+                            textInputAction: TextInputAction.next,
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(Icons.timer),
+                              filled: true,
+                              contentPadding:
+                                  EdgeInsets.fromLTRB(20, 15, 20, 15),
+                              labelText: "Time",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  makeRequest,
+            ],)            
+            
+             ),
+                
+
+        )
+      ]),
+      
     );
   }
-  
+    postDetailsToFirestore() async {
+    // calling our firestore
+    // calling our user model
+    // sedning these values
+
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+
+    Map<String, dynamic> data = {
+      "pickup": GeoPoint(50, 90),
+      "dropoff": GeoPoint(14, 60),
+      "time": _timeController.text,
+      "date": _dateController.text,
+      "uid": user!.uid
+    };
+
+    Carpool_req reqModel = Carpool_req();
+
+    // writing all the values
+    reqModel.pickup = GeoPoint(40, 90);
+    reqModel.dropoff = GeoPoint(40, 60);
+    reqModel.date = "90";
+    reqModel.time = "52";
+
+    await firebaseFirestore.collection("carpool_req").doc(user!.uid).set(data);
+    Fluttertoast.showToast(msg: "Request Added Sucessfully");
+  }
 }
+
 class AlwaysDisabledFocusNode extends FocusNode {
   @override
   bool get hasFocus => false;

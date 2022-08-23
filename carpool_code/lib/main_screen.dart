@@ -1,10 +1,12 @@
-// ignore_for_file: prefer_final_fields, non_constant_identifier_names, unused_element, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_final_fields, non_constant_identifier_names, unused_element, prefer_const_literals_to_create_immutables, unnecessary_null_comparison
 
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/Reverse_Geocoding/place_searcher_methods.dart';
+import 'package:flutter_application_1/bottomNavigation.dart';
+import 'package:flutter_application_1/dataHandler/dataHandler.dart';
 import 'package:flutter_application_1/divider.dart';
 import 'package:flutter_application_1/drawer.dart';
 import 'package:flutter_application_1/model/user_model.dart';
@@ -18,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/utils/routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 
 class Main_Screen extends StatefulWidget {
   const Main_Screen({Key? key}) : super(key: key);
@@ -46,6 +49,7 @@ class _Main_ScreenState extends State<Main_Screen> {
   // Declaration of variables.
   double bottom_padding_of_map = 0.0 ;
   String string_selected_date = "";
+  String home_temp = "Add Home";
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
   TextEditingController _dateController = TextEditingController();
@@ -72,9 +76,9 @@ class _Main_ScreenState extends State<Main_Screen> {
     CameraPosition cameraPosition = new CameraPosition(target: lat_position, zoom:14);
     new_google_map_controller_for_saving.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
-    String address = await placeSearcherMethods.searchCoodinateAddress(position);
+    String address = await placeSearcherMethods.searchCoodinateAddress(position, context);
     print("ap yhan rehte hen?" + address);
-    
+
 
   }
 
@@ -103,27 +107,7 @@ class _Main_ScreenState extends State<Main_Screen> {
         });
     }
 
-// Carpool Request Button
-    final makeRequest = Material(
-      elevation: 5,
-      borderRadius: BorderRadius.circular(30),
-      color: Colors.redAccent,
-      child: MaterialButton(
-          padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-          minWidth: MediaQuery.of(context).size.width,
-          onPressed: () {
-          
-            // FirebaseFirestore.instance.collection("RideRequest").add(request_map);
-            postDetailsToFirestore();
-            Navigator.pushNamed(context, Myroutes.Carpool_Request_page);
-          },
-          child: Text(
-            "Request",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
-          )),
-    );
+
 
 
     Widget pickup_and_dropoff(String text){
@@ -181,9 +165,29 @@ class _Main_ScreenState extends State<Main_Screen> {
       }
     }
 
+    Widget home_and_work_row(String message1,  String message2, Icon icon_to_put){
+      return Row(
+            children: [
+              Icon(icon_to_put.icon),
+              SizedBox(width: 12.0,),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(message1, style: TextStyle(fontSize: 10),),
+                  SizedBox(height: 4,),
+                  Text(message2,
+                  style: TextStyle(color: Colors.black54),)
+                ],
+              )
+            ],
+
+      );
+    }
+
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       extendBodyBehindAppBar: true,
+      extendBody: true,
       appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -197,6 +201,7 @@ class _Main_ScreenState extends State<Main_Screen> {
       
           ),
       drawer: MyDrawer(),
+    
       body: Stack(
         children: [
           GoogleMap(
@@ -225,7 +230,7 @@ class _Main_ScreenState extends State<Main_Screen> {
             right: 0.0,
             bottom: 0.0,
             child: Container(
-              height: 350.0,
+              height: 320.0,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
@@ -242,13 +247,13 @@ class _Main_ScreenState extends State<Main_Screen> {
               ),
               child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 18),
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 18),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 5.0),
                       Text(
-                        " Hi ${loggedInUser.firstName}",
+                        " Hi ${loggedInUser.firstName} ${loggedInUser.secondName}",
                         style: TextStyle(fontSize: 15),
                       ),
                       Text(
@@ -259,84 +264,51 @@ class _Main_ScreenState extends State<Main_Screen> {
                       SizedBox(
                         height: 26.0,
                       ),
-                      pickup_and_dropoff("Search Pickup Location"),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      pickup_and_dropoff("Search Dropoff Location"),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            height: size.height * 0.06,
-                            width: size.width * 0.42,
-                            child: InkWell(
-                              child: TextFormField(
-                                onSaved: (newValue) => selectedDate,
-                                readOnly: true,
-                                onTap: () {
-                                  _selectDate(context);
-                                  _dateController.clear();
-                                },
-                                textInputAction: TextInputAction.next,
-                                focusNode: AlwaysDisabledFocusNode(),
-                                controller: _dateController,
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.calendar_month),
-                                  filled: true,
-                                  hintText: "Date",
-                                  contentPadding:
-                                      EdgeInsets.fromLTRB(20, 15, 20, 15),
-                                  labelText: "Date",
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
+// As this entire container is the search dropoff field so now we have to wrap it with gesturable 
+                GestureDetector(
+                  onTap: () {
+                    // Now here we will make another page where user will be redirected. 
+                  Navigator.pushNamed(context, Myroutes.ride_request);
+
+
+                  },
+                  child: Container(
+                  decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(5.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black,
+                      blurRadius: 6.0,
+                      offset: Offset(0.7, 0.7),
+                      spreadRadius: 0.5,
+                    )
+                  ],
                               ),
-                            ),
+                
+                              child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(children: [
+                    Icon(Icons.search, color: Colors.purple,),
+                    SizedBox(width: 10,),
+                    Text("Search Drop Off")
+                  ]),
+                              ),   
                           ),
- 
-              SizedBox(
-              width: 5,
-              ),
-              SizedBox(
-                height: size.height * 0.06,
-                width: size.width * 0.42,
-                child: InkWell(
-                  child: TextFormField(
-                    focusNode: AlwaysDisabledFocusNode(),
-                    controller: _timeController,
-                    readOnly: true,
-                    onTap: () {
-                      // FocusScope.of(context).requestFocus(FocusNode());
-                      _selectTime(context);
-                    },
-                    autofocus: false,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.timer),
-                      filled: true,
-                      contentPadding:
-                          EdgeInsets.fromLTRB(20, 15, 20, 15),
-                      labelText: "Time",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+                )
+          ,
+          SizedBox(height:26.0),
+   
+          home_and_work_row( (Provider.of<carpool_data>(context).pickupLocation != null
 
-                        ],
-                      ),
-            SizedBox(
-              height: 10,
-            ),
-            makeRequest,
-
-                      
+                          ? Provider.of<carpool_data>(context)
+                              .pickupLocation
+                              ?.placeName
+                          : "Add home")!, "Your living address", Icon(Icons.home)),
+          SizedBox(height: 10),
+          Divider_Widget(),
+          SizedBox(height: 20.0),
+          home_and_work_row("Add University ", "Your University address", Icon(Icons.work)),
                     ]),
               ),
             ),
@@ -345,54 +317,11 @@ class _Main_ScreenState extends State<Main_Screen> {
       ),
     );
   }
-  postDetailsToFirestore() async {
-
-    // calling our firestore
-    // calling our user model
-    // sedning these values
-
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-
-      Map<String, dynamic> data = {
-      "pickup": GeoPoint(50,90),
-      "dropoff": GeoPoint(14,60),
-      "time": _timeController.text,
-      "date": _dateController.text,
-      "uid" : user!.uid
-    };
-
-    Carpool_req reqModel = Carpool_req();
-
-    // writing all the values
-    reqModel.pickup = GeoPoint(40, 90);
-    reqModel.dropoff = GeoPoint(40, 60);
-    reqModel.date = "90";
-    reqModel.time = "52";
-
-
-    await firebaseFirestore
-        .collection("carpool_req")
-        .doc(user!.uid)
-        .set(data);
-    Fluttertoast.showToast(msg: "Request Added Sucessfully");
-  }
 }
+
 class AlwaysDisabledFocusNode extends FocusNode {
   @override
   bool get hasFocus => false;
-}
-
-
-
-void sending_request_to_firestore(String pickup, String dropoff, String Date, String time){
-  Map<String, dynamic> data = {
-    "pickup": {"lat": 50, 'long': 20},
-    "dropoff": {"lat": 40, 'long': 20},
-    "time": "5:00",
-    "date": "25",
-  };
-
-  
 }
 
 

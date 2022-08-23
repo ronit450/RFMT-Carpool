@@ -45,6 +45,9 @@ dependencies:
   google_maps_flutter: ^2.1.10
   geolocator: ^9.0.1
   http: ^0.13.5
+  provider: ^6.0.3
+  curved_navigation_bar: ^1.0.3
+  
  
 
 
