@@ -1,6 +1,5 @@
 // ignore_for_file: prefer_final_fields, non_constant_identifier_names, unused_element, prefer_const_literals_to_create_immutables
 
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,8 +13,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ride_request extends StatefulWidget {
-  const ride_request({ Key? key }) : super(key: key);
-  
+  const ride_request({Key? key}) : super(key: key);
+
   @override
   State<ride_request> createState() => _ride_requestState();
 }
@@ -45,8 +44,6 @@ class _ride_requestState extends State<ride_request> {
   TextEditingController _dropoff = TextEditingController();
 
   @override
-
-
   Widget build(BuildContext context) {
     // Select time field
     Future<void> _selectTime(BuildContext context) async {
@@ -86,32 +83,38 @@ class _ride_requestState extends State<ride_request> {
           )),
     );
 
-    Widget pickup_dropoff(String text, Icon icon_to_put, TextEditingController controller_for_field){
+    Widget pickup_dropoff(String text, Icon icon_to_put,
+        TextEditingController controller_for_field) {
       return Row(
         children: [
           Icon(icon_to_put.icon),
-          SizedBox(width: 18,),
-          Expanded(child: 
-          Container(
+          SizedBox(
+            width: 18,
+          ),
+          Expanded(
+              child: Container(
+              height: 45,
+
             decoration: BoxDecoration(
               color: Colors.grey,
               borderRadius: BorderRadius.circular(6),
-             ),
-             child: Padding(padding: EdgeInsets.all(3.0),
-             child: TextField(
-              controller: controller_for_field,
-              decoration: InputDecoration(
-              hintText: "Pickup Location", 
-              fillColor: Colors.grey,
-              filled: true,
-              border: InputBorder.none,
-              isDense: true, 
-              contentPadding: EdgeInsets.only(left: 11, top: 8, bottom: 8)
-             ),),
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(3.0),
+              child: TextField(
+                controller: controller_for_field,
+                decoration: InputDecoration(
+                    hintText: "Pickup Location",
+                    fillColor: Colors.grey,
+                    filled: true,
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding:
+                        EdgeInsets.only(left: 11, top: 8, bottom: 8)),
               ),
-             ))
+            ),
+          ))
         ],
-
       );
     }
 
@@ -132,33 +135,30 @@ class _ride_requestState extends State<ride_request> {
         });
       }
     }
-  Widget select_time() {
-      return InkWell(
-        child: TextFormField(
-          onSaved: (newValue) => selectedDate,
-          readOnly: true,
-          onTap: () {
-            _selectDate(context);
-            _dateController.clear();
-          },
-          textInputAction: TextInputAction.next,
-          focusNode: AlwaysDisabledFocusNode(),
-          controller: _dateController,
-          decoration: InputDecoration(
-            prefixIcon: Icon(Icons.calendar_month),
-            filled: true,
-            hintText: "Date",
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-            labelText: "Date",
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        ),
-      );
-    }
-
-
+    // Widget select_date() {
+    //     return InkWell(
+    //       child: TextFormField(
+    //         onSaved: (newValue) => selectedDate,
+    //         readOnly: true,
+    //         onTap: () {
+    //           _selectDate(context);
+    //           _dateController.clear();
+    //         },
+    //         textInputAction: TextInputAction.next,
+    //         focusNode: AlwaysDisabledFocusNode(),
+    //         controller: _dateController,
+    //         decoration: InputDecoration(
+    //                       fillColor: Colors.grey,
+    //             border: InputBorder.none,
+    //             isDense: true,
+    //             contentPadding: EdgeInsets.only(left: 11, top: 8, bottom: 8),
+    //           filled: true,
+    //           hintText: "Date",
+    //           labelText: "Date",
+    //         ),
+    //       ),
+    //     );
+    //   }
 
     Widget pickup_and_dropoff(String text) {
       return Container(
@@ -194,15 +194,15 @@ class _ride_requestState extends State<ride_request> {
 
     // Select Date field for carpool request
 
-
-
     Size size = MediaQuery.of(context).size;
-    String placeAddress = Provider.of<carpool_data>(context).pickupLocation!.placeName?? "";
+    String placeAddress =
+        Provider.of<carpool_data>(context).pickupLocation!.placeName ?? "";
     _pickup.text = placeAddress;
     return Scaffold(
-      body: Column(children: [
+      body: Column(
+        children: [
         Container(
-          height: 340,
+          height: size.height,
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
@@ -215,84 +215,123 @@ class _ride_requestState extends State<ride_request> {
             ],
           ),
           child: Padding(
-            padding: EdgeInsets.only(left: 25, right: 25, top: 25, bottom: 20),
-            child:Column(children: [
-              SizedBox(height: 5),
-              Stack(
+              padding:
+                  EdgeInsets.only(left: 25, right: 25, top: 25, bottom: 20),
+              child: Column(
                 children: [
-                  GestureDetector(
-                    onTap:(){
-                      Navigator.pop(context);
-                    },
-                    child: Icon(Icons.arrow_back)),
-                  Center(
-                    child: Text(
-                      "Make a Request", 
-                      style: TextStyle(fontSize: 25, fontFamily: "Brand-Bold"),
-                    ),
-                  )
-                ],
-              ),
-              SizedBox(height: 24,),
-              pickup_dropoff("Search Pickup Location", Icon(CupertinoIcons.location), _pickup),
-              SizedBox(height: 18,),
-              pickup_dropoff("Search Dropoff Location", Icon(Icons.pin_drop_outlined), _dropoff ), 
-              SizedBox(height: 18,),
-              Column(
+                  SizedBox(height: 5),
+                  Stack(
                     children: [
-                      SizedBox(
-                        height: size.height * 0.06,
-                        width: size.width * 0.42,
-                        child: InkWell(
-                          child: TextFormField(
-                            onSaved: (newValue) => selectedDate,
-                            readOnly: true,
-                            onTap: () {
-                              _selectDate(context);
-                              _dateController.clear();
-                            },
-                            textInputAction: TextInputAction.next,
-                            focusNode: AlwaysDisabledFocusNode(),
-                            controller: _dateController,
-                            decoration: InputDecoration(
-                              prefixIcon: Icon(Icons.calendar_month),
-                              filled: true,
-                              hintText: "Date",
-                              contentPadding:
-                                  EdgeInsets.fromLTRB(20, 15, 20, 15),
-                              labelText: "Date",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Icon(Icons.arrow_back)),
+                      Center(
+                        child: Text(
+                          "Make a Request",
+                          style:
+                              TextStyle(fontSize: 25, fontFamily: "Brand-Bold"),
                         ),
-                      ),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 32,
+                  ),
+                  pickup_dropoff("Search Pickup Location",
+                      Icon(CupertinoIcons.location), _pickup),
+                  SizedBox(
+                    height: 18,
+                  ),
+                  pickup_dropoff("Search Dropoff Location",
+                      Icon(Icons.pin_drop_outlined), _dropoff),
+                  SizedBox(
+                    height: 18,
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.date_range),
                       SizedBox(
-                        width: 5,
+                        width: 18,),
+                      Expanded(
+                        child: Container(
+                          height: 45,
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                         
+                              child: Padding(
+                                padding: EdgeInsets.all(3.0),
+                                child: InkWell(
+                                  child: TextFormField(
+                                    onSaved: (newValue) => selectedDate,
+                                    readOnly: true,
+                                    onTap: () {
+                                      _selectDate(context);
+                                      _dateController.clear();
+                                    },
+                                    textInputAction: TextInputAction.next,
+                                    focusNode: AlwaysDisabledFocusNode(),
+                                    controller: _dateController,
+                                    decoration: InputDecoration(
+                                      fillColor: Colors.grey,
+                                      border: InputBorder.none,
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.only(
+                                          left: 11, top: 8, bottom: 8),
+                                      filled: true,
+                                      hintText: "Date",
+                                      labelText: "Date",
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            
+                            ),
                       ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.timer),
                       SizedBox(
-                        height: size.height * 0.06,
-                        width: size.width * 0.42,
-                        child: InkWell(
-                          child: TextFormField(
-                            focusNode: AlwaysDisabledFocusNode(),
-                            controller: _timeController,
-                            readOnly: true,
-                            onTap: () {
-                              // FocusScope.of(context).requestFocus(FocusNode());
-                              _selectTime(context);
-                            },
-                            autofocus: false,
-                            textInputAction: TextInputAction.next,
-                            decoration: InputDecoration(
-                              prefixIcon: Icon(Icons.timer),
-                              filled: true,
-                              contentPadding:
-                                  EdgeInsets.fromLTRB(20, 15, 20, 15),
-                              labelText: "Time",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
+                        width: 18,
+                      ),
+                      Expanded(
+                        child: Container(
+                          height: 45,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(3.0),
+                                                    child: InkWell(
+                              child: TextFormField(
+                                focusNode: AlwaysDisabledFocusNode(),
+                                controller: _timeController,
+                                readOnly: true,
+                                onTap: () {
+                                  // FocusScope.of(context).requestFocus(FocusNode());
+                                  _selectTime(context);
+                                },
+                                autofocus: false,
+                                textInputAction: TextInputAction.next,
+                                decoration: InputDecoration(
+                                  fillColor: Colors.grey,
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.only(
+                                      left: 11, top: 8, bottom: 8),
+                                  filled: true,
+                                  labelText: "Time",
+
+                                ),
                               ),
                             ),
                           ),
@@ -300,21 +339,16 @@ class _ride_requestState extends State<ride_request> {
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
+                  SizedBox(height: 40),
                   makeRequest,
-            ],)            
-            
-             ),
-                
-
+                ],
+              )),
         )
       ]),
-      
     );
   }
-    postDetailsToFirestore() async {
+
+  postDetailsToFirestore() async {
     // calling our firestore
     // calling our user model
     // sedning these values

@@ -392,3 +392,65 @@ class GeolocatorService {
   }
 }
 
+              // Column(
+              //       children: [
+              //         SizedBox(
+              //           height: size.height * 0.06,
+              //           width: size.width * 0.42,
+              //           child: InkWell(
+              //             child: TextFormField(
+              //               onSaved: (newValue) => selectedDate,
+              //               readOnly: true,
+              //               onTap: () {
+              //                 _selectDate(context);
+              //                 _dateController.clear();
+              //               },
+              //               textInputAction: TextInputAction.next,
+              //               focusNode: AlwaysDisabledFocusNode(),
+              //               controller: _dateController,
+              //               decoration: InputDecoration(
+              //                 prefixIcon: Icon(Icons.calendar_month),
+              //                 filled: true,
+              //                 hintText: "Date",
+              //                 contentPadding:
+              //                     EdgeInsets.fromLTRB(20, 15, 20, 15),
+              //                 labelText: "Date",
+              //                 border: OutlineInputBorder(
+              //                   borderRadius: BorderRadius.circular(10),
+              //                 ),
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //         SizedBox(
+              //           width: 5,
+              //         ),
+              //         SizedBox(
+              //           height: size.height * 0.06,
+              //           width: size.width * 0.42,
+              //           child: InkWell(
+              //             child: TextFormField(
+              //               focusNode: AlwaysDisabledFocusNode(),
+              //               controller: _timeController,
+              //               readOnly: true,
+              //               onTap: () {
+              //                 // FocusScope.of(context).requestFocus(FocusNode());
+              //                 _selectTime(context);
+              //               },
+              //               autofocus: false,
+              //               textInputAction: TextInputAction.next,
+              //               decoration: InputDecoration(
+              //                 prefixIcon: Icon(Icons.timer),
+              //                 filled: true,
+              //                 contentPadding:
+              //                     EdgeInsets.fromLTRB(20, 15, 20, 15),
+              //                 labelText: "Time",
+              //                 border: OutlineInputBorder(
+              //                   borderRadius: BorderRadius.circular(10),
+              //                 ),
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       ],
+              //     ),
