@@ -27,14 +27,13 @@ class Main_Screen extends StatefulWidget {
 
   @override
   State<Main_Screen> createState() => _Main_ScreenState();
-  
 }
 
 class _Main_ScreenState extends State<Main_Screen> {
   User? user = FirebaseAuth.instance.currentUser;
   final _auth = FirebaseAuth.instance;
   UserModel loggedInUser = UserModel();
-    void initState() {
+  void initState() {
     super.initState();
     FirebaseFirestore.instance
         .collection("users")
@@ -47,7 +46,7 @@ class _Main_ScreenState extends State<Main_Screen> {
   }
 
   // Declaration of variables.
-  double bottom_padding_of_map = 0.0 ;
+  double bottom_padding_of_map = 0.0;
   String string_selected_date = "";
   String home_temp = "Add Home";
   DateTime selectedDate = DateTime.now();
@@ -60,28 +59,29 @@ class _Main_ScreenState extends State<Main_Screen> {
   late Position current_position;
   var geoLocater = Geolocator();
 
-
-
-
   void locateCurrentpos() async {
-    
     LocationPermission permission;
     permission = await Geolocator.requestPermission();
 
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
     current_position = position;
     // As the location comes with Geopoint with lattitude and longitude
-    LatLng lat_position = LatLng(position.latitude, position.longitude); 
+    LatLng lat_position = LatLng(position.latitude, position.longitude);
 
-    CameraPosition cameraPosition = new CameraPosition(target: lat_position, zoom:14);
-    new_google_map_controller_for_saving.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    CameraPosition cameraPosition =
+        new CameraPosition(target: lat_position, zoom: 14);
+    new_google_map_controller_for_saving
+        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
-    String address = await placeSearcherMethods.searchCoodinateAddress(position, context);
+    String address =
+        await placeSearcherMethods.searchCoodinateAddress(position, context);
     print("ap yhan rehte hen?" + address);
-
-
   }
 
+  Position get_current_position() {
+    return current_position;
+  }
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -107,10 +107,7 @@ class _Main_ScreenState extends State<Main_Screen> {
         });
     }
 
-
-
-
-    Widget pickup_and_dropoff(String text){
+    Widget pickup_and_dropoff(String text) {
       return Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -140,8 +137,6 @@ class _Main_ScreenState extends State<Main_Screen> {
             ],
           ),
         ),
-
-
       );
     }
 
@@ -165,22 +160,31 @@ class _Main_ScreenState extends State<Main_Screen> {
       }
     }
 
-    Widget home_and_work_row(String message1,  String message2, Icon icon_to_put){
+    Widget home_and_work_row(
+        String message1, String message2, Icon icon_to_put) {
       return Row(
+        children: [
+          Icon(icon_to_put.icon),
+          SizedBox(
+            width: 12.0,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon_to_put.icon),
-              SizedBox(width: 12.0,),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(message1, style: TextStyle(fontSize: 10),),
-                  SizedBox(height: 4,),
-                  Text(message2,
-                  style: TextStyle(color: Colors.black54),)
-                ],
+              Text(
+                message1, overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 14),
+              ),
+              SizedBox(
+                height: 4,
+              ),
+              Text(
+                message2,
+                style: TextStyle(color: Colors.black54),
               )
             ],
-
+          )
+        ],
       );
     }
 
@@ -189,19 +193,17 @@ class _Main_ScreenState extends State<Main_Screen> {
       extendBodyBehindAppBar: true,
       extendBody: true,
       appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.red),
-            onPressed: () {
-              // passing this to our root
-              Navigator.of(context).pop();
-            },
-          ),
-      
-          ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.red),
+          onPressed: () {
+            // passing this to our root
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
       drawer: MyDrawer(),
-    
       body: Stack(
         children: [
           GoogleMap(
@@ -247,7 +249,7 @@ class _Main_ScreenState extends State<Main_Screen> {
               ),
               child: Padding(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 18),
+                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 18),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -264,51 +266,57 @@ class _Main_ScreenState extends State<Main_Screen> {
                       SizedBox(
                         height: 26.0,
                       ),
-// As this entire container is the search dropoff field so now we have to wrap it with gesturable 
-                GestureDetector(
-                  onTap: () {
-                    // Now here we will make another page where user will be redirected. 
-                  Navigator.pushNamed(context, Myroutes.ride_request);
-
-
-                  },
-                  child: Container(
-                  decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black,
-                      blurRadius: 6.0,
-                      offset: Offset(0.7, 0.7),
-                      spreadRadius: 0.5,
-                    )
-                  ],
-                              ),
-                
-                              child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Row(children: [
-                    Icon(Icons.search, color: Colors.purple,),
-                    SizedBox(width: 10,),
-                    Text("Search Drop Off")
-                  ]),
-                              ),   
+// As this entire container is the search dropoff field so now we have to wrap it with gesturable
+                      GestureDetector(
+                        onTap: () {
+                          // Now here we will make another page where user will be redirected.
+                          Navigator.pushNamed(context, Myroutes.ride_request,
+                              arguments: current_position);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black,
+                                blurRadius: 6.0,
+                                offset: Offset(0.7, 0.7),
+                                spreadRadius: 0.5,
+                              )
+                            ],
                           ),
-                )
-          ,
-          SizedBox(height:26.0),
-   
-          home_and_work_row( (Provider.of<carpool_data>(context).pickupLocation != null
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(children: [
+                              Icon(
+                                Icons.search,
+                                color: Colors.purple,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text("Search Drop Off")
+                            ]),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 26.0),
 
-                          ? Provider.of<carpool_data>(context)
-                              .pickupLocation
-                              ?.placeName
-                          : "Add home")!, "Your living address", Icon(Icons.home)),
-          SizedBox(height: 10),
-          Divider_Widget(),
-          SizedBox(height: 20.0),
-          home_and_work_row("Add University ", "Your University address", Icon(Icons.work)),
+                      home_and_work_row(
+                          (Provider.of<carpool_data>(context).pickupLocation !=
+                                  null
+                              ? Provider.of<carpool_data>(context)
+                                  .pickupLocation
+                                  ?.placeName
+                              : "Add home")!,
+                          "Your living address",
+                          Icon(Icons.home)),
+                      SizedBox(height: 10),
+                      Divider_Widget(),
+                      SizedBox(height: 20.0),
+                      home_and_work_row("Add University ",
+                          "Your University address", Icon(Icons.work)),
                     ]),
               ),
             ),
@@ -323,7 +331,6 @@ class AlwaysDisabledFocusNode extends FocusNode {
   @override
   bool get hasFocus => false;
 }
-
 
 class GeolocatorService {
   Future<Position?> determinePosition() async {

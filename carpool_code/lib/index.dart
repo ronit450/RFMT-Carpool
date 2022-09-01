@@ -16,7 +16,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_application_1/welcome.dart';
 import 'package:provider/provider.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -29,7 +28,7 @@ class Carpool extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      // This is done because we want to add some data which can be accessible with all the pages we will access. 
+      // This is done because we want to add some data which can be accessible with all the pages we will access.
       // This have changed the functionality to change notifier provider
       create: (context) => carpool_data(),
       child: MaterialApp(
@@ -64,9 +63,10 @@ class Carpool extends StatelessWidget {
           '/login': (context) => LoginScreen(),
           '/home': (context) => Homepage(),
           '/signup': (context) => RegistrationScreen(),
-          '/ride_request': (context) => ride_request(),
-          '/request_page' :(context) => RideRequest(),
-          '/main_screen':(context) => Main_Screen(),
+          '/ride_request': (context) => ride_request(
+              ModalRoute.of(context)!.settings.arguments as Position),
+          '/request_page': (context) => RideRequest(),
+          '/main_screen': (context) => Main_Screen(),
         },
       ),
     );

@@ -1,19 +1,31 @@
-// ignore_for_file: prefer_final_fields, non_constant_identifier_names, unused_element, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_final_fields, non_constant_identifier_names, unused_element, prefer_const_literals_to_create_immutables, unnecessary_null_comparison
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Reverse_Geocoding/place_searcher.dart';
 import 'package:flutter_application_1/dataHandler/dataHandler.dart';
+import 'package:flutter_application_1/divider.dart';
+import 'package:flutter_application_1/main_screen.dart';
 import 'package:flutter_application_1/model/Request_Model.dart';
+import 'package:flutter_application_1/model/google_maps.dart';
+import 'package:flutter_application_1/model/placePredictions.dart';
+import 'package:flutter_application_1/model/placePredictions.dart';
 import 'package:flutter_application_1/model/user_model.dart';
 import 'package:flutter_application_1/utils/routes.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import 'model/placePredictions.dart';
+
+
+
 class ride_request extends StatefulWidget {
-  const ride_request({Key? key}) : super(key: key);
+  final Position current_pos; 
+  const ride_request(this.current_pos, {Key? key}) : super(key: key);
 
   @override
   State<ride_request> createState() => _ride_requestState();
@@ -42,6 +54,8 @@ class _ride_requestState extends State<ride_request> {
   TextEditingController _timeController = TextEditingController();
   TextEditingController _pickup = TextEditingController();
   TextEditingController _dropoff = TextEditingController();
+  List<placePredictions> placePredictions_lst = [];
+
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +77,8 @@ class _ride_requestState extends State<ride_request> {
     }
 
 // Carpool Request Button
-    final makeRequest = Material(
+    Widget makeRequest(String text_to_add){
+    return Material(
       elevation: 5,
       borderRadius: BorderRadius.circular(30),
       color: Colors.redAccent,
@@ -76,12 +91,13 @@ class _ride_requestState extends State<ride_request> {
             Navigator.pushNamed(context, Myroutes.Carpool_Request_page);
           },
           child: Text(
-            "Request",
+            text_to_add,
             textAlign: TextAlign.center,
             style: TextStyle(
                 fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
           )),
     );
+    }
 
     Widget pickup_dropoff(String text, Icon icon_to_put,
         TextEditingController controller_for_field) {
@@ -102,6 +118,9 @@ class _ride_requestState extends State<ride_request> {
             child: Padding(
               padding: EdgeInsets.all(3.0),
               child: TextField(
+                onChanged: (val){
+                  find_location(val, widget.current_pos);
+                },
                 controller: controller_for_field,
                 decoration: InputDecoration(
                     hintText: "Pickup Location",
@@ -202,7 +221,7 @@ class _ride_requestState extends State<ride_request> {
       body: Column(
         children: [
         Container(
-          height: size.height,
+          height: size.height*0.8,
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
@@ -280,10 +299,10 @@ class _ride_requestState extends State<ride_request> {
                                       border: InputBorder.none,
                                       isDense: true,
                                       contentPadding: EdgeInsets.only(
-                                          left: 11, top: 8, bottom: 8),
+                                          left: 15, top: 15, bottom: 15),
                                       filled: true,
                                       hintText: "Date",
-                                      labelText: "Date",
+                                      
                                     ),
                                   ),
                                 ),
@@ -327,9 +346,9 @@ class _ride_requestState extends State<ride_request> {
                                   border: InputBorder.none,
                                   isDense: true,
                                   contentPadding: EdgeInsets.only(
-                                      left: 11, top: 8, bottom: 8),
+                                      left: 15, top: 15, bottom: 15),
                                   filled: true,
-                                  labelText: "Time",
+                                  hintText: "Time",
 
                                 ),
                               ),
@@ -340,13 +359,60 @@ class _ride_requestState extends State<ride_request> {
                     ],
                   ),
                   SizedBox(height: 40),
-                  makeRequest,
+                  makeRequest("Request Carpool"),
+                  SizedBox(height: 40,),
+                  makeRequest("Post Carpool"),
                 ],
               )),
-        )
+        ),
+      // tile for predictions to be added as list
+       
+        (placePredictions_lst.length>0)? Padding(padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16), child: ListView.separated(
+          padding: EdgeInsets.all(0),
+          itemBuilder: (context, index){
+            return PredictionTile(placePredictions_obj: placePredictions_lst[index],);
+
+          },
+          separatorBuilder: (BuildContext context, int index) => Divider_Widget(),
+          itemCount:placePredictions_lst.length,
+          shrinkWrap: true,
+          physics: ClampingScrollPhysics(),
+        ),):Container(),
       ]),
     );
   }
+  void find_location(String placeName, Position current_pos) async{
+   if(placeName !=  null){
+    final main_screen_obj = Main_Screen();
+      final current_lat = current_pos.latitude;
+      final current_lon = current_pos.latitude;
+  
+
+      
+      String auto_complete_url = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&key=$google_map_api_key&components=country:pk&radius=100000&location=$current_lat%$current_lon";
+
+      var response = await placeSearcher.getRequest(auto_complete_url);
+
+      if (response =="failed"){
+        return;
+      }
+
+      print(response);
+
+      if (response["status"] == "OK"){
+        var predictions = response["predictions"];
+        // this will basically convery the json data in list format
+        var place_lst = (predictions as List).map((e) => placePredictions.fromJson(e)).toList();
+        placePredictions_lst = place_lst;
+        
+        setState(() {
+          placePredictions_lst = place_lst;
+        });
+
+      }
+
+   }
+}
 
   postDetailsToFirestore() async {
     // calling our firestore
@@ -379,4 +445,47 @@ class _ride_requestState extends State<ride_request> {
 class AlwaysDisabledFocusNode extends FocusNode {
   @override
   bool get hasFocus => false;
+}
+
+
+
+
+class PredictionTile extends StatelessWidget {
+  final placePredictions placePredictions_obj;
+  const PredictionTile({ Key? key, required this.placePredictions_obj }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          SizedBox(
+            height: 10 ,
+          ),
+          Row(children: [
+          Icon(Icons.add_location),
+          SizedBox(width: 14.0,), 
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(placePredictions_obj.main_text, overflow: TextOverflow.ellipsis, style:  TextStyle(fontSize: 16),),
+                SizedBox(height: 3,),
+                Text(placePredictions_obj.secondary_text, overflow: TextOverflow.ellipsis,
+                  style:  TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+          
+              ],
+            ),
+          )
+        ]),
+        SizedBox(
+          height: 10,
+        )
+
+        ],
+      ),
+      
+    );
+  }
 }
