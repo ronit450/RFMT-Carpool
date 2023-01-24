@@ -57,7 +57,7 @@ class Carpool extends StatelessWidget {
         //     return CircularProgressIndicator();
         //   },
         // ),
-        initialRoute: '/main_screen',
+        initialRoute: '/',
         routes: {
           '/': (context) => Welcome(),
           '/login': (context) => LoginScreen(),
